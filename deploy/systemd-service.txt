@@ -1,0 +1,39 @@
+# /etc/systemd/system/morning-briefing.service
+# VM에서 이 파일을 생성하세요
+
+[Unit]
+Description=Morning Briefing Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/morning-briefing
+Environment=RAILS_ENV=production
+ExecStart=/bin/bash -lc 'bundle exec rake solid_queue:start'
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+---
+
+# /etc/systemd/system/morning-briefing-bot.service
+# 텔레그램 봇 폴링용 (상세 분석 버튼 처리)
+
+[Unit]
+Description=Morning Briefing Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/morning-briefing
+Environment=RAILS_ENV=production
+ExecStart=/bin/bash -lc 'bundle exec rake telegram:bot'
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+version: 2
+updates:
+# Bundler(Gemfile/Gemfile.lock) 의존성(gem) 업데이트를 감지해 PR을 생성합니다.
+- package-ecosystem: bundler
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10

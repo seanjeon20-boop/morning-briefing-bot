@@ -1,0 +1,99 @@
+# examples:
+#   periodic_cleanup:
+#     class: CleanSoftDeletedRecordsJob
+#     queue: background
+#     args: [ 1000, { batch_size: 500 } ]
+#     schedule: every hour
+#   periodic_cleanup_with_command:
+#     command: "SoftDeletedRecord.due.delete_all"
+#     priority: 2
+#     schedule: at 5am every day
+
+production:
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+
+  # Morning Briefing - runs at KST 05:25 (UTC 20:25 previous day)
+  # Covers: KST 23:00 (previous day) ~ KST 05:30
+  # Starts at 05:25 so messages arrive by 06:00
+  morning_briefing:
+    class: MorningBriefingJob
+    queue: default
+    schedule: at 8:25pm every day
+
+  # Update Briefings - every 3 hours starting KST 09:00 (UTC 00:00)
+  # KST 09:00 = UTC 00:00
+  update_briefing_09:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at midnight every day
+
+  # KST 12:00 = UTC 03:00
+  update_briefing_12:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at 3am every day
+
+  # KST 15:00 = UTC 06:00
+  update_briefing_15:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at 6am every day
+
+  # KST 18:00 = UTC 09:00
+  update_briefing_18:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at 9am every day
+
+  # KST 21:00 = UTC 12:00
+  update_briefing_21:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at 12pm every day
+
+  # Weekly Review - runs at KST 09:00 every Saturday (UTC 00:00)
+  weekly_review:
+    class: WeeklyReviewJob
+    queue: default
+    schedule: at midnight every saturday
+
+development:
+  # Morning Briefing - runs at KST 05:25 (UTC 20:25 previous day)
+  morning_briefing:
+    class: MorningBriefingJob
+    queue: default
+    schedule: at 8:25pm every day
+
+  # Update Briefings - every 3 hours
+  update_briefing_09:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at midnight every day
+
+  update_briefing_12:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at 3am every day
+
+  update_briefing_15:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at 6am every day
+
+  update_briefing_18:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at 9am every day
+
+  update_briefing_21:
+    class: UpdateBriefingJob
+    queue: default
+    schedule: at 12pm every day
+
+  # Weekly Review
+  weekly_review:
+    class: WeeklyReviewJob
+    queue: default
+    schedule: at midnight every saturday
