@@ -6,7 +6,9 @@ class MorningBriefingJob < ApplicationJob
   # Retry on transient errors
   retry_on StandardError, wait: :polynomially_longer, attempts: 3
 
-  def perform(date: Date.current)
+  def perform(date: nil)
+    # Use KST timezone for date calculation to avoid UTC offset issues
+    date ||= Time.current.in_time_zone("Asia/Seoul").to_date
     Rails.logger.info "Starting morning briefing job for #{date}"
 
     # Initialize services
