@@ -15,12 +15,15 @@ class YoutubeCrawler
   end
 
   # Fetch videos uploaded during sleep hours (KST 23:00 ~ 05:30)
-  # @param date [Date] The date to fetch videos for (defaults to today)
+  # @param date [Date] The date to fetch videos for (defaults to today in KST)
   # @return [Array<Hash>] Array of video information hashes
-  def fetch_morning_videos(date: Date.current)
+  def fetch_morning_videos(date: nil)
+    # Use KST timezone for date calculation to avoid UTC offset issues
+    kst_now = Time.current.in_time_zone("Asia/Seoul")
+    kst_today = date ? date.in_time_zone("Asia/Seoul") : kst_now.to_date.in_time_zone("Asia/Seoul")
+    
     # KST 23:00 (previous day) ~ KST 05:30 (today)
     # Cutoff at 05:30 so processing finishes by 06:00
-    kst_today = date.in_time_zone("Asia/Seoul")
     kst_start = (kst_today - 1.day).change(hour: 23)           # Yesterday 23:00 KST
     kst_end = kst_today.change(hour: 5, min: 30)               # Today 05:30 KST
 
