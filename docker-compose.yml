@@ -50,7 +50,7 @@ services:
     volumes:
       - db_data:/rails/db
       - storage_data:/rails/storage
-    command: ["./bin/rails", "telegram_bot:start"]
+    command: ["./bin/rake", "telegram:bot"]
     restart: unless-stopped
 
 volumes:
