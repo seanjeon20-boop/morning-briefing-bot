@@ -1,0 +1,16 @@
+[Unit]
+Description=Morning Briefing Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/morning-briefing
+EnvironmentFile=/opt/morning-briefing/.env
+Environment=RAILS_ENV=production
+ExecStart=/bin/bash -lc 'cd /opt/morning-briefing && /root/.rbenv/shims/bundle exec rake telegram:bot'
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

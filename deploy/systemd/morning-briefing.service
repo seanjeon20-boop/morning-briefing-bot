@@ -1,0 +1,16 @@
+[Unit]
+Description=Morning Briefing Bot - Solid Queue Worker
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/morning-briefing
+EnvironmentFile=/opt/morning-briefing/.env
+Environment=RAILS_ENV=production
+ExecStart=/bin/bash -lc 'cd /opt/morning-briefing && /root/.rbenv/shims/bundle exec rake solid_queue:start'
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
