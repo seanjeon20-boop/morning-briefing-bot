@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    environment:
+      - RAILS_ENV=production
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+    volumes:
+      - db_data:/rails/db
+      - storage_data:/rails/storage
+    command: ["./bin/rails", "server", "-b", "0.0.0.0"]
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - jobs
+
+  jobs:
+    build: .
+    environment:
+      - RAILS_ENV=production
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+    volumes:
+      - db_data:/rails/db
+      - storage_data:/rails/storage
+    command: ["./bin/rails", "solid_queue:start"]
+    restart: unless-stopped
+
+  telegram_bot:
+    build: .
+    environment:
+      - RAILS_ENV=production
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+    volumes:
+      - db_data:/rails/db
+      - storage_data:/rails/storage
+    command: ["./bin/rails", "telegram_bot:start"]
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  storage_data:
