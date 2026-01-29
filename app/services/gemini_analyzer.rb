@@ -324,8 +324,10 @@ class GeminiAnalyzer
   def parse_brief_response(response)
     return default_brief_response(nil) if response.blank?
 
-    # Extract JSON from response (handle markdown code blocks)
-    json_match = response.match(/\{[\s\S]*\}/)
+    # Remove markdown code blocks if present
+    cleaned = response.gsub(/```json\s*/i, '').gsub(/```\s*/, '')
+    
+    json_match = cleaned.match(/\{[\s\S]*\}/)
     return default_brief_response(nil) unless json_match
 
     data = JSON.parse(json_match[0])
@@ -349,21 +351,30 @@ class GeminiAnalyzer
   def parse_detailed_response(response)
     return default_detailed_response(nil) if response.blank?
 
-    json_match = response.match(/\{[\s\S]*\}/)
+    # Remove markdown code blocks if present
+    cleaned = response.gsub(/```json\s*/i, '').gsub(/```\s*/, '')
+    
+    json_match = cleaned.match(/\{[\s\S]*\}/)
     return default_detailed_response(nil) unless json_match
 
     data = JSON.parse(json_match[0])
 
     {
-      six_w_analysis: data["six_w_analysis"] || {},
+      six_w_analysis: symbolize_keys(data["six_w_analysis"] || {}),
       market_connection: data["market_connection"] || "분석 정보 없음",
-      investment_implications: data["investment_implications"] || {},
+      investment_implications: symbolize_keys(data["investment_implications"] || {}),
       related_tickers: data["related_tickers"] || [],
       confidence_level: data["confidence_level"] || "low"
     }
   rescue JSON::ParserError => e
     Rails.logger.error "JSON parse error in detailed response: #{e.message}"
+    Rails.logger.error "Response was: #{response[0..500]}"
     default_detailed_response(nil)
+  end
+
+  def symbolize_keys(hash)
+    return {} unless hash.is_a?(Hash)
+    hash.transform_keys(&:to_sym)
   end
 
   def default_brief_response(video)
