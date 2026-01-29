@@ -28,7 +28,7 @@ class MorningBriefingJob < ApplicationJob
 
     if videos.empty?
       Rails.logger.info "No videos found for #{date}"
-      telegram_bot.send_message("📭 #{date.strftime('%Y.%m.%d')} 모닝 브리핑\n\n해당 시간대에 새로운 영상이 없습니다.")
+      telegram_bot.send_message("📭 *#{date.strftime('%Y.%m.%d')} 아침 브리핑*\n\n해당 시간대에 새로운 영상이 없습니다.")
       return
     end
 

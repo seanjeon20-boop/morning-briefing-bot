@@ -79,7 +79,7 @@ class TelegramBotService
 
   def build_market_summary_text(market_data)
     lines = [
-      "📊 *#{Date.current.strftime('%Y.%m.%d')} 모닝 브리핑*",
+      "🌅 *#{Date.current.strftime('%Y.%m.%d')} 아침 브리핑*",
       "",
       "*\\[시장 현황\\]*"
     ]

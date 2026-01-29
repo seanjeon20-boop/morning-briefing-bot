@@ -35,8 +35,8 @@ class UpdateBriefingJob < ApplicationJob
     if videos.empty?
       Rails.logger.info "No new videos in the last 3 hours"
       # Send "no videos" message so user knows the system is working
-      time_range = "#{kst_start.strftime('%H:%M')} ~ #{kst_end.strftime('%H:%M')}"
-      telegram_bot.send_message("📭 *업데이트 브리핑* (#{time_range} KST)\n\n해당 시간대에 새로운 영상이 없습니다.\n\n_다음 업데이트: 3시간 후_")
+      update_hour = kst_end.strftime('%H:%M')
+      telegram_bot.send_message("📭 *#{update_hour} 업데이트*\n\n해당 시간대에 새로운 영상이 없습니다.\n\n_다음 업데이트: 3시간 후_")
       return
     end
 
@@ -99,11 +99,12 @@ class UpdateBriefingJob < ApplicationJob
   private
 
   def send_update_briefing(telegram_bot, processed_videos, market_data, one_line_insight, start_time, end_time)
-    time_range = "#{start_time.strftime('%H:%M')} ~ #{end_time.strftime('%H:%M')}"
-
+    # Use end_time to determine the update name (e.g., "09:00 업데이트")
+    update_hour = end_time.strftime('%H:%M')
+    
     # Send header
     header = <<~MSG
-      🔄 *업데이트 브리핑* (#{time_range} KST)
+      🔄 *#{update_hour} 업데이트*
       
       새로운 영상 #{processed_videos.size}개 분석 완료
     MSG
