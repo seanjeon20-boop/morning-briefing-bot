@@ -146,40 +146,18 @@ class GeminiAnalyzer
 
       #{market_context}
 
-      Provide a comprehensive analysis of this financial news using the 6W framework.
-      Focus on ACTIONABLE insights for AI/tech sector investing.
+      Provide a comprehensive 6W analysis (Who, What, When, Where, Why, How) of this financial news.
+      Focus on ACTIONABLE insights across ALL sectors (not just tech).
 
       Video Title: #{video[:title]}
       Channel: #{video[:channel]}
       #{content}
 
-      Respond in Korean with the following JSON format:
-      {
-        "six_w_analysis": {
-          "who": "누가 관련되어 있는가 (기업, 인물, 기관)",
-          "what": "무엇이 발생했는가 (핵심 이벤트)",
-          "when": "언제 발생했거나 예정되어 있는가",
-          "where": "어디서 영향을 미치는가 (시장, 지역, 섹터)",
-          "why": "왜 중요한가 (배경과 맥락)",
-          "how": "어떻게 전개될 것인가 (전망과 시나리오)"
-        },
-        "market_connection": "현재 시장 상황과의 연관성 분석",
-        "trade_recommendation": {
-          "primary_pick": "최우선 추천 종목 (티커)",
-          "entry_point": "진입 가격대 또는 조건",
-          "target_price": "목표가",
-          "stop_loss": "손절 라인",
-          "position_size": "추천 비중 (포트폴리오의 몇 %)",
-          "time_horizon": "투자 기간"
-        },
-        "investment_implications": {
-          "opportunities": ["기회 요인 1", "기회 요인 2"],
-          "risks": ["위험 요인 1", "위험 요인 2"],
-          "action_items": ["구체적 행동 1", "구체적 행동 2"]
-        },
-        "related_tickers": ["관련 종목들"],
-        "confidence_level": "high/medium/low"
-      }
+      IMPORTANT: Respond with ONLY valid JSON. No markdown, no code blocks, no extra text.
+      All values must be in Korean.
+
+      JSON format (copy this structure exactly, replace values with your analysis):
+      {"six_w_analysis":{"who":"관련 기업/인물/기관을 여기에","what":"핵심 이벤트를 여기에","when":"시점을 여기에","where":"영향 범위를 여기에","why":"중요한 이유를 여기에","how":"전개 전망을 여기에"},"market_connection":"시장 연관성 분석을 여기에","investment_implications":{"opportunities":["기회1","기회2"],"risks":["리스크1","리스크2"],"action_items":["행동1","행동2"]},"related_tickers":["종목1","종목2"],"confidence_level":"high"}
     PROMPT
 
     response = generate(prompt)

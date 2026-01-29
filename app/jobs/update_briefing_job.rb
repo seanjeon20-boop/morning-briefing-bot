@@ -34,7 +34,9 @@ class UpdateBriefingJob < ApplicationJob
 
     if videos.empty?
       Rails.logger.info "No new videos in the last 3 hours"
-      # Don't send message if no videos - avoid spam
+      # Send "no videos" message so user knows the system is working
+      time_range = "#{kst_start.strftime('%H:%M')} ~ #{kst_end.strftime('%H:%M')}"
+      telegram_bot.send_message("📭 *업데이트 브리핑* (#{time_range} KST)\n\n해당 시간대에 새로운 영상이 없습니다.\n\n_다음 업데이트: 3시간 후_")
       return
     end
 
