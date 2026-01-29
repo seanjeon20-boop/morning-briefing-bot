@@ -41,17 +41,13 @@ production:
     queue: default
     schedule: at 6am every day
 
-  # KST 18:00 = UTC 09:00
+  # KST 18:00 = UTC 09:00 (마지막 업데이트 - 21:00 이후는 수면 시간)
   update_briefing_18:
     class: UpdateBriefingJob
     queue: default
     schedule: at 9am every day
 
-  # KST 21:00 = UTC 12:00
-  update_briefing_21:
-    class: UpdateBriefingJob
-    queue: default
-    schedule: at 12pm every day
+  # KST 21:00 알림 제거 - 수면 시간 (21:00 ~ 다음날 06:00)
 
   # Weekly Review - runs at KST 09:00 every Saturday (UTC 00:00)
   weekly_review:
@@ -87,10 +83,7 @@ development:
     queue: default
     schedule: at 9am every day
 
-  update_briefing_21:
-    class: UpdateBriefingJob
-    queue: default
-    schedule: at 12pm every day
+  # KST 21:00 알림 제거 - 수면 시간
 
   # Weekly Review
   weekly_review:

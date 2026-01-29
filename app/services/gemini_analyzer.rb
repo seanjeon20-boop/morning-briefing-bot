@@ -10,20 +10,27 @@ class GeminiAnalyzer
     You are at VP/Partner level and have managed billions in assets.
     
     Your client is a Korean individual investor with 30M KRW seed money, targeting 100M KRW.
-    They are interested in US equities, with a focus on AI/Tech but OPEN TO ALL SECTORS.
+    They use this service to DISCOVER INVESTMENT OPPORTUNITIES across ALL SECTORS.
+    
+    CRITICAL - SECTOR DIVERSITY:
+    - DO NOT focus only on Tech/AI - cover ALL sectors equally
+    - Healthcare, Energy, Financials, Consumer, Industrials, Real Estate, Utilities, Materials
+    - The client wants to EXPAND their perspective, not stay in a tech bubble
+    - Identify which sector(s) this news belongs to and explain why it matters
     
     IMPORTANT RULES:
     1. Recommend stocks ACTUALLY MENTIONED in the news, not just default to NVDA/MSFT
-    2. If the news is about GM, recommend GM. If about Boeing, recommend BA. Be specific to the content.
-    3. Diversify recommendations across sectors - don't always recommend the same stocks
+    2. If the news is about GM, recommend GM. If about pharmaceuticals, recommend those stocks
+    3. ALWAYS identify the relevant sector(s) - be specific (e.g., "Automotive", "Biotech", "Cloud Infrastructure")
     4. If a stock is NOT directly related to the news, don't recommend it
-    5. Consider the ACTUAL news content, not your general market knowledge
-    6. Be contrarian when appropriate - not everything is a buy
+    5. Be contrarian when appropriate - not everything is a buy
+    6. Help the client see opportunities they might otherwise miss
     
     Your job is to:
-    1. Analyze the SPECIFIC news content and recommend RELEVANT stocks mentioned
-    2. Give concrete, actionable recommendations with entry points
-    3. Be direct - sometimes the answer is "이 뉴스는 관망" if there's no clear trade
+    1. Analyze the SPECIFIC news content and identify WHICH SECTOR it belongs to
+    2. Explain how to INTERPRET this news (what does it really mean?)
+    3. Give INVESTOR PERSPECTIVE (how should an investor think about this?)
+    4. Recommend RELEVANT stocks mentioned in the news
   PERSONA
 
   # Rate limiting (less aggressive for Vertex AI paid tier)
@@ -60,11 +67,11 @@ class GeminiAnalyzer
     @last_call_time = nil
   end
 
-  # Generate a brief summary for the video (3 lines + investment opinion)
+  # Generate a comprehensive summary for the video
   # @param video [Hash] Video data from YoutubeCrawler
   # @param transcript [String, nil] Video transcript
   # @param market_data [Hash] Current market data
-  # @return [Hash] Summary and investment opinion
+  # @return [Hash] Summary, AI interpretation, investor perspective, sector, and recommendations
   def brief_summary(video:, transcript:, market_data:)
     content = build_content(video, transcript)
     market_context = build_market_context(market_data)
@@ -74,27 +81,46 @@ class GeminiAnalyzer
 
       #{market_context}
 
-      Analyze this financial news video and provide:
-      1. A 3-line summary in Korean (핵심 내용 3줄 요약) - focus on what matters for AI/tech investing
-      2. Investment opinion in Korean - be SPECIFIC about tickers and timing
-      3. If there's a trade opportunity, say it clearly
+      Analyze this financial news video comprehensively. The client wants to EXPAND their investment perspective.
 
       Video Title: #{video[:title]}
       Channel: #{video[:channel]}
       #{content}
 
-      CRITICAL: Only recommend stocks that are DIRECTLY mentioned or clearly relevant to THIS specific news.
-      Do NOT default to NVDA/MSFT unless the news is actually about them.
-      If news is about GM earnings, recommend GM. If about Boeing, recommend BA. Be news-specific!
+      Provide analysis in Korean with the following structure:
+
+      1. **5줄 요약**: 뉴스의 핵심 내용을 5줄로 요약 (각 줄은 1-2문장)
+      
+      2. **AI의 해석** (5줄): 이 뉴스를 어떻게 해석해야 하는지
+         - 단순 사실 전달이 아닌, "이게 왜 중요한지", "숨겨진 의미가 무엇인지" 분석
+         - 시장에 미치는 영향, 연쇄 효과 등
+      
+      3. **투자자 관점** (5줄): 투자자로서 이 뉴스를 어떻게 봐야 하는지
+         - 기회와 리스크
+         - 어떤 포지션을 취할 수 있는지
+         - 타이밍 고려사항
+      
+      4. **섹터 분류**: 이 뉴스가 속한 섹터를 구체적으로 명시
+         - 예: "Healthcare > Biotech", "Technology > Cloud Infrastructure", "Energy > Renewable"
+         - 테크/AI에 편향되지 말고 실제 뉴스 내용에 맞는 섹터 분류
+      
+      5. **관련 종목**: 뉴스에서 직접 언급되거나 명확히 관련된 종목만
+
+      CRITICAL: 
+      - 테크/AI 편향 금지! 뉴스가 자동차면 자동차, 제약이면 제약 섹터로 분류
+      - 추천 종목은 뉴스에서 실제 언급된 것만
+      - 모든 내용은 한국어로 작성
 
       Respond in the following JSON format only:
       {
-        "summary_lines": ["첫 번째 요약", "두 번째 요약", "세 번째 요약"],
-        "investment_opinion": "이 뉴스에 대한 구체적 의견 - 해당 종목과 타이밍",
-        "recommended_tickers": ["뉴스에 언급된 실제 종목들"],
+        "summary_lines": ["요약1", "요약2", "요약3", "요약4", "요약5"],
+        "ai_interpretation": ["해석1", "해석2", "해석3", "해석4", "해석5"],
+        "investor_perspective": ["관점1", "관점2", "관점3", "관점4", "관점5"],
+        "sector": "메인섹터 > 서브섹터",
+        "sector_explanation": "이 섹터로 분류한 이유",
+        "recommended_tickers": ["뉴스에 언급된 종목들"],
         "action": "BUY/SELL/HOLD/WATCH",
         "urgency": "immediate/this_week/monitoring",
-        "related_sectors": ["관련 섹터1", "관련 섹터2"],
         "sentiment": "positive/negative/neutral"
       }
     PROMPT
@@ -306,11 +332,13 @@ class GeminiAnalyzer
 
     {
       summary_lines: data["summary_lines"] || [],
-      investment_opinion: data["investment_opinion"] || "분석 정보 없음",
+      ai_interpretation: data["ai_interpretation"] || [],
+      investor_perspective: data["investor_perspective"] || [],
+      sector: data["sector"] || "미분류",
+      sector_explanation: data["sector_explanation"] || "",
       recommended_tickers: data["recommended_tickers"] || [],
       action: data["action"] || "WATCH",
       urgency: data["urgency"] || "monitoring",
-      related_sectors: data["related_sectors"] || [],
       sentiment: data["sentiment"] || "neutral"
     }
   rescue JSON::ParserError => e
@@ -341,11 +369,13 @@ class GeminiAnalyzer
   def default_brief_response(video)
     {
       summary_lines: [ "요약 정보를 가져올 수 없습니다." ],
-      investment_opinion: "분석 정보 없음",
+      ai_interpretation: [ "해석 정보를 가져올 수 없습니다." ],
+      investor_perspective: [ "투자자 관점 정보를 가져올 수 없습니다." ],
+      sector: "미분류",
+      sector_explanation: "",
       recommended_tickers: [],
       action: "WATCH",
       urgency: "monitoring",
-      related_sectors: [],
       sentiment: "neutral"
     }
   end

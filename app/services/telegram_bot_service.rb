@@ -156,12 +156,6 @@ class TelegramBotService
     else "📋 분석"
     end
 
-    urgency_text = case analysis[:urgency]
-    when "immediate" then "⚡ 즉시"
-    when "this_week" then "📅 금주 내"
-    else ""
-    end
-
     lines = [
       "",
       "━━━━━━━━━━━━━━━━━━",
@@ -170,27 +164,41 @@ class TelegramBotService
       ""
     ]
 
-    # 3줄 요약
+    # 섹터 표시
+    if analysis[:sector].present? && analysis[:sector] != "미분류"
+      lines << "🏷 *섹터*: #{escape_markdown(analysis[:sector])}"
+      lines << ""
+    end
+
+    # 5줄 요약
+    lines << "📝 *요약*"
     analysis[:summary_lines].each_with_index do |line, i|
       lines << "#{i + 1}. #{escape_markdown(line)}"
     end
 
-    # 액션 & 추천 종목
-    if analysis[:recommended_tickers]&.any?
+    # AI 해석 (5줄)
+    if analysis[:ai_interpretation]&.any?
       lines << ""
-      lines << "#{action_emoji} #{urgency_text}"
-      lines << "🎯 *추천 종목*: #{analysis[:recommended_tickers].join(', ')}"
+      lines << "🤖 *AI의 해석*"
+      analysis[:ai_interpretation].each do |line|
+        lines << "• #{escape_markdown(line)}"
+      end
     end
 
-    # 투자 의견
-    lines << ""
-    lines << "💡 *투자 포인트*"
-    lines << escape_markdown(analysis[:investment_opinion])
-
-    # 관련 섹터
-    if analysis[:related_sectors]&.any?
+    # 투자자 관점 (5줄)
+    if analysis[:investor_perspective]&.any?
       lines << ""
-      lines << "🏷 관련: #{analysis[:related_sectors].join(', ')}"
+      lines << "💰 *투자자 관점*"
+      analysis[:investor_perspective].each do |line|
+        lines << "• #{escape_markdown(line)}"
+      end
+    end
+
+    # 추천 종목 & 액션
+    if analysis[:recommended_tickers]&.any?
+      lines << ""
+      lines << "#{action_emoji}"
+      lines << "🎯 *관련 종목*: #{analysis[:recommended_tickers].join(', ')}"
     end
 
     lines.join("\n")
